@@ -1,11 +1,11 @@
 package com.java.healthybasket.HealthyBasket.controller;
 
 import com.java.healthybasket.HealthyBasket.model.DailyEssentials;
-import com.java.healthybasket.HealthyBasket.model.Fruits;
+//import com.java.healthybasket.HealthyBasket.model.Fruits;
 import com.java.healthybasket.HealthyBasket.model.Vegetables;
-import com.java.healthybasket.HealthyBasket.repository.FruitsRepository;
+//import com.java.healthybasket.HealthyBasket.repository.FruitsRepository;
 import com.java.healthybasket.HealthyBasket.service.DailyEssentialsDataService;
-import com.java.healthybasket.HealthyBasket.service.FruitsDataService;
+//import com.java.healthybasket.HealthyBasket.service.FruitsDataService;
 import com.java.healthybasket.HealthyBasket.service.VegetablesDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
