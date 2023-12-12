@@ -1,20 +1,15 @@
 package com.java.healthybasket.HealthyBasket.controller;
 
-import com.java.healthybasket.HealthyBasket.model.DailyEssentials;
-//import com.java.healthybasket.HealthyBasket.model.Fruits;
-import com.java.healthybasket.HealthyBasket.model.Vegetables;
-//import com.java.healthybasket.HealthyBasket.repository.FruitsRepository;
-import com.java.healthybasket.HealthyBasket.service.DailyEssentialsDataService;
-//import com.java.healthybasket.HealthyBasket.service.FruitsDataService;
-import com.java.healthybasket.HealthyBasket.service.VegetablesDataService;
+import com.java.healthybasket.HealthyBasket.model.DailyEssentialsData;
+import com.java.healthybasket.HealthyBasket.service.DailyEssentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 
 @RequestMapping("/basket")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -22,71 +17,82 @@ import java.util.Optional;
 public class DailyEssentialsController {
 
     @Autowired
-    DailyEssentialsDataService dailyEssentialsDataService;
+    private DailyEssentialsService dailyEssentialsService;
 
-    @GetMapping("/dailyessentials")
-    public ResponseEntity<List<DailyEssentials>> getAllDailyEssentials(String name){
+    @GetMapping("/getDailyEssentials")
+    public ResponseEntity<List<DailyEssentialsData>> getAllDailyEssentials(String name){
         try{
-            List<DailyEssentials> dailyEssentials = new ArrayList<>();
+            List<DailyEssentialsData> files = new ArrayList<>();
             if(name==null){
-                dailyEssentials.addAll(dailyEssentialsDataService.findAll());
+                files.addAll(dailyEssentialsService.findAll());
             } else {
-                dailyEssentials.addAll(dailyEssentialsDataService.findByName(name));
+                System.out.println(dailyEssentialsService.findAll());
             }
-            if(dailyEssentials.isEmpty()) {
+            if(files.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<>(dailyEssentials,HttpStatus.OK);
+            return new ResponseEntity<>(files,HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-//
-//    @GetMapping("/fruits/{id}")
-//    public ResponseEntity<Fruits> getFruitById(@PathVariable("id") long id){
-//        Optional<Fruits> optional = fruitsDataService.findById(id);
-//        return optional.map(fruits -> new ResponseEntity<>(fruits, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-//    }
-//
-//    @PostMapping("/fruits")
-//    public ResponseEntity<Fruits> createFruits(@RequestBody Fruits newfruit){
-//        fruitsDataService.save(newfruit);
-//        return new ResponseEntity<>(HttpStatus.CREATED);
-//    }
 
-//    @PutMapping("/fruits/{id}")
-//    public Fruits updateFruits(@PathVariable("id") long id, @RequestBody Fruits fruit){
-//        return fruitsDataService.findById(id)
-//                .map(fruits->{
-//                    fruits.setName(fruit.getName());
-//                    fruits.setSlogan(fruit.getSlogan());
-//                    fruits.setDescription(fruit.getDescription());
-//                    fruits.setQuantity(fruit.getQuantity());
-//                    fruits.setPrice(fruit.getPrice());
-//                    fruits.setWeight(fruit.getWeight());
-//                    fruits.setLifetime(fruit.getLifetime());
-//                    fruits.setHealthBenefits(fruit.getHealthBenefits());
-//                    fruits.setImage(fruit.getImage());
-//                    fruits.setDate(fruit.getDate());
-//                    return fruitsDataService.save(fruits);
-//                })
-//                .orElseGet(()->{
-//                    return  fruitsDataService.save(fruit);
-//                });
-//    }
+    @GetMapping("/getDailyEssentials/{name}")
+    public DailyEssentialsData getDailyEssentials(@PathVariable("name") String name){
+        DailyEssentialsData dailyEssentials = dailyEssentialsService.getDailyEssentialsByName(name);
+        return dailyEssentials;
+    }
+    @PostMapping("/addDailyEssentials")
+    public ResponseEntity<String> storeFilesIntoDb(@RequestParam("file")MultipartFile file,
+                                                   @RequestParam("name") String name,
+                                                   @RequestParam("slogan") String slogan,
+                                                   @RequestParam("description") String description,
+                                                   @RequestParam("price") Integer price,
+                                                   @RequestParam("healthBenefits") String healthBenefits,
+                                                   @RequestParam("weight") String weight,
+                                                   @RequestParam("lifetime") String lifetime,
+                                                   @RequestParam("quantity") Integer quantity,
+                                                   @RequestParam("date") Date addedDate
+    ) throws IOException {
+        String response = dailyEssentialsService.storeImage(file,name,slogan,description,price,healthBenefits,weight,lifetime,quantity,addedDate);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
-//    @DeleteMapping("/fruits/all")
-//    public void removeAllFruits(@PathVariable("id") Long id){
-//        fruitsRepository.deleteById(id);
-//    }
 
-//    @DeleteMapping("/fruits/{id}")
-//    public ResponseEntity<Fruits> removeFruitsById(@PathVariable("id") long id){
-//        Optional<Fruits> optional = fruitsDataService.findById(id);
-//        if(optional.isPresent()){
-//            fruitsDataService.deleteById(id);
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }
-//        return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+    @PutMapping("updateDailyEssentials/{name}")
+    public ResponseEntity<DailyEssentialsData> updateUser(@PathVariable String name,
+                                                 @RequestParam("file")MultipartFile file,
+                                                 @RequestParam("slogan") String slogan,
+                                                 @RequestParam("description") String description,
+                                                 @RequestParam("price") Integer price,
+                                                 @RequestParam("healthBenefits") String healthBenefits,
+                                                 @RequestParam("weight") String weight,
+                                                 @RequestParam("lifetime") String lifetime,
+                                                 @RequestParam("quantity") Integer quantity,
+                                                 @RequestParam("date") Date addedDate) throws IOException {
+        DailyEssentialsData dailyEssentials = dailyEssentialsService.getDailyEssentialsByName(name);
+        if (!(dailyEssentials.getName()).equals("")) {
+            dailyEssentials.setName(name);
+            dailyEssentials.setSlogan(slogan);
+            dailyEssentials.setDescription(description);
+            dailyEssentials.setPrice(price);
+            dailyEssentials.setQuantity(quantity);
+            dailyEssentials.setWeight(weight);
+            dailyEssentials.setAddedDate(addedDate);
+            dailyEssentials.setImagePath(file.getBytes());
+            dailyEssentials.setHealthBenefits(healthBenefits);
+            dailyEssentials.setLifetime(lifetime);
+            dailyEssentialsService.save(dailyEssentials);
+            return new ResponseEntity<>(dailyEssentials, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    @DeleteMapping("/dailyessentials/{name}")
+    public ResponseEntity<String> deleteMovieById(@PathVariable("name") String name)
+    {
+        DailyEssentialsData dailyEssentials = dailyEssentialsService.getDailyEssentialsByName(name);
+        dailyEssentialsService.delete(dailyEssentials);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

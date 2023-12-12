@@ -9,9 +9,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class FruitsDataService {
+public class FruitsService {
 
     @Autowired
     private FruitsDataRepository fruitsDataRepository;
@@ -48,6 +49,8 @@ public class FruitsDataService {
     public FruitsData getFruitByName(String name){
         return fruitsDataRepository.findByName(name);
     }
+
+//    public List<FruitsData> getFruitsByCategory(String category){return fruitsDataRepository.findByCategory(category);}
 
     public List<FruitsData> findAll() {
         return fruitsDataRepository.findAll();

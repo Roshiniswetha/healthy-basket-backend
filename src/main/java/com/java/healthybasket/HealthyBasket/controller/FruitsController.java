@@ -1,7 +1,8 @@
 package com.java.healthybasket.HealthyBasket.controller;
 
+//import com.java.healthybasket.HealthyBasket.model.CategoryData;
 import com.java.healthybasket.HealthyBasket.model.FruitsData;
-import com.java.healthybasket.HealthyBasket.service.FruitsDataService;
+import com.java.healthybasket.HealthyBasket.service.FruitsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +15,10 @@ import java.util.*;
 @RequestMapping("/basket")
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-public class FruitsDataController {
+public class FruitsController {
 
     @Autowired
-    private FruitsDataService fruitsDataService;
+    private FruitsService fruitsDataService;
 
     @GetMapping("/getFruits")
     public ResponseEntity<List<FruitsData>> getAllFruits(String name){
@@ -34,6 +35,35 @@ public class FruitsDataController {
             return new ResponseEntity<>(files,HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getFruitsByCategory")
+    public ResponseEntity<HashMap<String,List<FruitsData>>> getFruitsByCategory() {
+//        Optional<CategoryData> category = categoryRepository.findByName(categoryName);
+        try {
+            List<FruitsData> fruits = fruitsDataService.findAll();
+
+            if (fruits.size() > 0) {
+                HashMap<String, List<FruitsData>> fruitsByCategory = new HashMap<>();
+//            List<FruitsData> fruitsListByCategory = new ArrayList<>();
+                for (FruitsData singleFruit : fruits) {
+                    if (fruitsByCategory.containsKey(singleFruit.getCategory())) {
+//                        List<FruitsData> fruitsListByCategory = fruitsByCategory.get(singleFruit.getCategory());
+//                        fruitsListByCategory.add(singleFruit);
+                        fruitsByCategory.get(singleFruit.getCategory()).add(singleFruit);
+//                        fruitsByCategory.put(singleFruit.getCategory(), fruitsListByCategory);
+                    } else {
+                        System.out.println(singleFruit.getCategory());
+                        fruitsByCategory.put(singleFruit.getCategory(), new ArrayList<FruitsData>(Collections.singleton(singleFruit)));
+                    }
+                }
+                return new ResponseEntity<>(fruitsByCategory, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 

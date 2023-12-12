@@ -12,8 +12,8 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "fruits")
-public class FruitsData {
+@Table(name = "vegetables")
+public class VegetablesData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,7 +45,6 @@ public class FruitsData {
     private byte[] imagePath;
 
 //    @ManyToOne
-//    @JoinColumn(name = "categoryTypeName")
-//    @Embedded
-    private String category;
+//    @JoinColumn(name = "category")
+//    private CategoryData category;
 }
